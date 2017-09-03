@@ -264,11 +264,15 @@ void analyze_map(char **map, int width, int height)
 
 int main(int argc, char *argv[])
 {
-	int w, h;
+	if (argc != 3) {
+		cerr << argv[0] << " <width> <height>" << endl;
+		return 1;
+	}
+
 	char** map;
 
-	scanf("%d", &w);
-	scanf("%d", &h);
+	int w = stoi(argv[1]);
+	int h = stoi(argv[2]);
 
 	w = w / 2 * 2 + 1;
 	h = h / 2 * 2 + 1;
