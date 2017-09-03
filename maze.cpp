@@ -251,14 +251,6 @@ void analyze_map(char **map, int width, int height)
 			return;
 		vector<Position>& availables = list_available(map, position);
 
-/*
-		if (!availables.size()) {
-			set_value(map, position, 0);
-			positions.pop_back();
-			continue;
-		}
-*/
-
 		if (!availables.size()) {
 			//くぁｗせｄｒｆｔｇｙふじこｌｐ
 		}
@@ -280,25 +272,12 @@ int main(int argc, char *argv[])
 
 	w = w / 2 * 2 + 1;
 	h = h / 2 * 2 + 1;
-/*
-	if(w > 255)
-		w = 255;
-	if(h > 255)
-		h = 255;
-*/
+
 	printf("%d %d\n", w, h);
 
 	map = generate_map(w, h);
 
 	generate_maze(map, w, h);
-
-
-/*
-	if(argc == 1)
-		print_maze(map, w, h);
-	else
-		print_maze_code(map, w, h);
-*/
 
 	Mat image(h * BLOCK_WIDTH, w * BLOCK_WIDTH, CV_8UC3);
 	for (int i = 2; i < h + 2; i++) {
@@ -314,22 +293,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	imwrite("maze.bmp", image);
-/*
-	analyze_map(map, w, h);
 
-	for (int i = 2; i < h + 2; i++) {
-		int y = (i - 2) * BLOCK_WIDTH;
-		for (int j = 2; j < w + 2; j++) {
-			int x = (j - 2) * BLOCK_WIDTH;
-			if (map[i][j] != 2)
-				continue;
-			for (int dy = 0; dy < BLOCK_WIDTH; dy++)
-				for (int dx = 0; dx < BLOCK_WIDTH; dx++)
-					image[y + dy][x + dx][1] = image[y + dy][x + dx][2] = 0;
-		}
-	}
-	image.writeImage("maze.bmp");
-*/
 	destroy_map(map, h);
 
 	return 0;
