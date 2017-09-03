@@ -3,13 +3,14 @@
 #include <cmath>
 #include <vector>
 #include <random>
-
-#include "Image.h"
+#include <opencv2/core.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 //壁の厚さ
 #define BLOCK_WIDTH	1
 
 using namespace std;
+using namespace cv;
 
 class Position {
 	int x, y;
@@ -218,7 +219,7 @@ void analyze_map(char **map, int width, int height)
 		cout << "(" << position.getX() << ", " << position.getY() << ")" << "[" << positions.size() << "]\n";
 		set_value(map, position, 2);
 		{
-			Image<> image(width * BLOCK_WIDTH, height * BLOCK_WIDTH);
+			Mat image(height * BLOCK_WIDTH, width * BLOCK_WIDTH, CV_8UC3);
 			for (int i = 2; i < height + 2; i++) {
 				int y = (i - 2) * BLOCK_WIDTH;
 				for (int j = 2; j < width + 2; j++) {
@@ -228,7 +229,7 @@ void analyze_map(char **map, int width, int height)
 					for (int dy = 0; dy < BLOCK_WIDTH; dy++)
 						for (int dx = 0; dx < BLOCK_WIDTH; dx++)
 							for (int k = 0; k < 3; k++)
-							image[y + dy][x + dx][k] = 255;
+								image.data[(y + dy) * image.step + (x + dx) * image.elemSize() + k] = 255;
 				}
 			}
 
@@ -240,10 +241,10 @@ void analyze_map(char **map, int width, int height)
 						continue;
 					for (int dy = 0; dy < BLOCK_WIDTH; dy++)
 						for (int dx = 0; dx < BLOCK_WIDTH; dx++)
-							image[y + dy][x + dx][0] = 255;
+							image.data[(y + dy) * image.step + (x + dx) * image.elemSize()] = 255;
 				}
 			}
-			image.writeImage("maze.bmp");
+			imwrite("maze.bmp", image);
 			getchar();
 		}
 		if (position == goal)
@@ -299,7 +300,7 @@ int main(int argc, char *argv[])
 		print_maze_code(map, w, h);
 */
 
-	Image<> image(w * BLOCK_WIDTH, h * BLOCK_WIDTH);
+	Mat image(h * BLOCK_WIDTH, w * BLOCK_WIDTH, CV_8UC3);
 	for (int i = 2; i < h + 2; i++) {
 		int y = (i - 2) * BLOCK_WIDTH;
 		for (int j = 2; j < w + 2; j++) {
@@ -309,10 +310,10 @@ int main(int argc, char *argv[])
 			for (int dy = 0; dy < BLOCK_WIDTH; dy++)
 				for (int dx = 0; dx < BLOCK_WIDTH; dx++)
 					for (int k = 0; k < 3; k++)
-					image[y + dy][x + dx][k] = 255;
+						image.data[(y + dy) * image.step + (x + dx) * image.elemSize() + k] = 255;
 		}
 	}
-	image.writeImage("maze.bmp");
+	imwrite("maze.bmp", image);
 /*
 	analyze_map(map, w, h);
 
