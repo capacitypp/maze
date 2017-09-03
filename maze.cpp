@@ -27,12 +27,12 @@ class Node {
 	Node* parent;
 	vector<Node*> childs;
 public:
-	inline Node(Node* parent_) : parent(parent_), childs(NULL) { }
+	inline Node(Node* parent_) : parent(parent_) { }
 	inline ~Node() { cout << "~Node\n"; }
 	inline Node* getParent() const { return parent; }
 	inline void addChild(Node* child) { childs.push_back(child); }
 	inline void removeChild(Node* child) {
-		for (int i = 0; i < childs.size(); i++) {
+		for (vector<Node*>::size_type i = 0; i < childs.size(); i++) {
 			if (childs[i] == child) {
 				childs.erase(childs.begin() + i);
 				break;
@@ -263,7 +263,7 @@ void analyze_map(char **map, int width, int height)
 			//くぁｗせｄｒｆｔｇｙふじこｌｐ
 		}
 		positions.pop_back();
-		for (int i = 0; i < availables.size(); i++) {
+		for (vector<Position>::size_type i = 0; i < availables.size(); i++) {
 			positions.push_back(availables[i]);
 		}
 	}
