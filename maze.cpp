@@ -42,32 +42,12 @@ public:
 	inline vector<Node*> getChilds() const { return childs; }
 };
 
-void destroy_map(char** map, int height)
+vector<vector<char>> generate_map(int width, int height)
 {
-	while (--height > 0)
-		delete[] map[height];
-	delete[] map;
+	return vector<vector<char>>(height + 4, vector<char>(width + 4, 0));
 }
 
-char** generate_map(int width, int height)
-{
-	char** map;
-	height += 4;
-	width += 4;
-	map = new char*[height];
-	if (map == NULL)
-		return NULL;
-	for (int i = 0; i < height; i++) {
-		map[i] = new char[width];
-		if (map[i] == NULL)
-			destroy_map(map, i);
-		for (int j = 0; j < width; j++)
-			map[i][j] = 0;
-	}
-	return map;
-}
-
-bool is_available(char** map, const Position& position)
+bool is_available(const vector<vector<char>>& map, const Position& position)
 {
 	int x = position.getX();
 	int y = position.getY();
@@ -78,7 +58,7 @@ bool is_available(char** map, const Position& position)
 	return false;
 }
 
-vector<Position>& list_available(char** map, const Position& position)
+vector<Position>& list_available(const vector<vector<char>>& map, const Position& position)
 {
 	int x = position.getX();
 	int y = position.getY();
@@ -90,7 +70,7 @@ vector<Position>& list_available(char** map, const Position& position)
 	return *new vector<Position>(positions);
 }
 
-void set_value(char** map, const Position& position, char value)
+void set_value(vector<vector<char>>& map, const Position& position, char value)
 {
 	map[position.getY()][position.getX()] = value;
 }
@@ -100,7 +80,7 @@ Position center_position(const Position& p1, const Position& p2)
 	return Position((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2);
 }
 
-vector<Position> get_gateway(char** map, int width, int height)
+vector<Position> get_gateway(const vector<vector<char>>& map, int width, int height)
 {
 	vector<Position> positions;
 	for (int i = 3; i < width + 1; i++) {
@@ -118,7 +98,7 @@ vector<Position> get_gateway(char** map, int width, int height)
 	return vector<Position>(positions);
 }
 
-void generate_maze(char** map, int width, int height)
+void generate_maze(vector<vector<char>>& map, int width, int height)
 {
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < width + 4; j++) {
@@ -184,7 +164,7 @@ void generate_maze(char** map, int width, int height)
 	}
 }
 
-Position get_next(char** map, const Position& position)
+Position get_next(const vector<vector<char>>& map, const Position& position)
 {
 	int x = position.getX();
 	int y = position.getY();
@@ -199,7 +179,7 @@ Position get_next(char** map, const Position& position)
 	return Position(-1, -1);
 }
 
-void analyze_map(char **map, int width, int height)
+void analyze_map(vector<vector<char>>& map, int width, int height)
 {
 	vector<Position> gateways = get_gateway(map, width, height);
 	if (gateways.size() != 2) {
@@ -269,8 +249,6 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	char** map;
-
 	int w = stoi(argv[1]);
 	int h = stoi(argv[2]);
 
@@ -279,7 +257,7 @@ int main(int argc, char *argv[])
 
 	printf("%d %d\n", w, h);
 
-	map = generate_map(w, h);
+	vector<vector<char>> map = generate_map(w, h);
 
 	generate_maze(map, w, h);
 
@@ -297,8 +275,6 @@ int main(int argc, char *argv[])
 		}
 	}
 	imwrite("maze.bmp", image);
-
-	destroy_map(map, h);
 
 	return 0;
 }
