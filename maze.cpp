@@ -23,25 +23,6 @@ public:
 	inline bool operator==(const Position& src) const { return (x == src.x) && (y == src.y); }
 };
 
-class Node {
-	Node* parent;
-	vector<Node*> childs;
-public:
-	inline Node(Node* parent_) : parent(parent_) { }
-	inline ~Node() { cout << "~Node\n"; }
-	inline Node* getParent() const { return parent; }
-	inline void addChild(Node* child) { childs.push_back(child); }
-	inline void removeChild(Node* child) {
-		for (vector<Node*>::size_type i = 0; i < childs.size(); i++) {
-			if (childs[i] == child) {
-				childs.erase(childs.begin() + i);
-				break;
-			}
-		}
-	}
-	inline vector<Node*> getChilds() const { return childs; }
-};
-
 vector<vector<char>> generate_map(int width, int height)
 {
 	return vector<vector<char>>(height + 4, vector<char>(width + 4, 0));
@@ -78,24 +59,6 @@ void set_value(vector<vector<char>>& map, const Position& position, char value)
 Position center_position(const Position& p1, const Position& p2)
 {
 	return Position((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2);
-}
-
-vector<Position> get_gateway(const vector<vector<char>>& map, int width, int height)
-{
-	vector<Position> positions;
-	for (int i = 3; i < width + 1; i++) {
-		if (!map[2][i])
-			positions.push_back(Position(i, 2));
-		if (!map[height + 1][i])
-			positions.push_back(Position(i, height + 1));
-	}
-	for (int i = 3; i < height + 1; i++) {
-		if (!map[i][2])
-			positions.push_back(Position(2, i));
-		if (!map[i][width + 1])
-			positions.push_back(Position(width + 1, i));
-	}
-	return vector<Position>(positions);
 }
 
 void generate_maze(vector<vector<char>>& map, int width, int height)
@@ -162,84 +125,6 @@ void generate_maze(vector<vector<char>>& map, int width, int height)
 		set_value(map, position, 0);
 		positions.erase(positions.begin() + idx);
 	}
-}
-
-Position get_next(const vector<vector<char>>& map, const Position& position)
-{
-	int x = position.getX();
-	int y = position.getY();
-	if (!map[y][x + 1])
-		return Position(x + 1, y);
-	if (!map[y][x - 1])
-		return Position(x - 1, y);
-	if (!map[y + 1][x])
-		return Position(x, y + 1);
-	if (!map[y - 1][x])
-		return Position(x, y - 1);
-	return Position(-1, -1);
-}
-
-void analyze_map(vector<vector<char>>& map, int width, int height)
-{
-	vector<Position> gateways = get_gateway(map, width, height);
-	if (gateways.size() != 2) {
-		cout << "CannotFindGatewaysException.\n";
-		return;
-	}
-
-	vector<Position> positions;
-	Position start(get_next(map, gateways[0]));
-	positions.push_back(start);
-	set_value(map, start, 2);
-	Position goal(get_next(map, gateways[1]));
-	cout << "goal(" << goal.getX() << ", " << goal.getY() << ")\n";
-	set_value(map, goal, 0);
-	while (positions.size()) {
-		const Position& position = positions.back();
-		cout << "(" << position.getX() << ", " << position.getY() << ")" << "[" << positions.size() << "]\n";
-		set_value(map, position, 2);
-		{
-			Mat image(height * BLOCK_WIDTH, width * BLOCK_WIDTH, CV_8UC3);
-			for (int i = 2; i < height + 2; i++) {
-				int y = (i - 2) * BLOCK_WIDTH;
-				for (int j = 2; j < width + 2; j++) {
-					int x = (j - 2) * BLOCK_WIDTH;
-					if (map[i][j])
-						continue;
-					for (int dy = 0; dy < BLOCK_WIDTH; dy++)
-						for (int dx = 0; dx < BLOCK_WIDTH; dx++)
-							for (int k = 0; k < 3; k++)
-								image.data[(y + dy) * image.step + (x + dx) * image.elemSize() + k] = 255;
-				}
-			}
-
-			for (int i = 2; i < height + 2; i++) {
-				int y = (i - 2) * BLOCK_WIDTH;
-				for (int j = 2; j < width + 2; j++) {
-					int x = (j - 2) * BLOCK_WIDTH;
-					if (map[i][j] != 2)
-						continue;
-					for (int dy = 0; dy < BLOCK_WIDTH; dy++)
-						for (int dx = 0; dx < BLOCK_WIDTH; dx++)
-							image.data[(y + dy) * image.step + (x + dx) * image.elemSize()] = 255;
-				}
-			}
-			imwrite("maze.bmp", image);
-			getchar();
-		}
-		if (position == goal)
-			return;
-		vector<Position>& availables = list_available(map, position);
-
-		if (!availables.size()) {
-			//くぁｗせｄｒｆｔｇｙふじこｌｐ
-		}
-		positions.pop_back();
-		for (vector<Position>::size_type i = 0; i < availables.size(); i++) {
-			positions.push_back(availables[i]);
-		}
-	}
-
 }
 
 int main(int argc, char *argv[])
